@@ -1,9 +1,20 @@
 ﻿Site ID,max_power
-DR Peng Shanghai,4000
-CU Chengdu,6000
-CU Guangzhou,6000
-CU Beijing,3000
+CT Shanghai,4280
+CM Shanghai,4000
 CU Shanghai,4000
+DR Peng Shanghai,4000
+CT Beijing,5000
+CM Beijing,5000
+CU Beijing,3000
 DR Peng Beijing,3750
-CU Wuhan,5000
+CT Guangzhou,5000
+CM Guangzhou,5000
+CU Guangzhou,6000
 DR Peng Guangzhou,3750
+CT Chengdu,5000
+CM Chengdu,5000
+CU Chengdu,6000
+GDS,3000
+CT Wuhan,6000
+CM Wuhan,4000
+CU Wuhan,5000

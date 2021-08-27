@@ -11,7 +11,7 @@ import chi_test as ct
 
 raw_path = '/Users/pei/pydir/RHS_anly/raw_data/'
 result_path = '/Users/pei/pydir/RHS_anly/result/'
-rhs_log = pd.read_csv(raw_path + 'RHS Usage Log-Summary-update_anly.csv')
+rhs_log = pd.read_csv(raw_path + 'RHS Usage Log-Summary-update 20210827.csv')
 max_cab_pwr = pd.read_csv(raw_path + 'max_cab_power.csv')
 site_list = max_cab_pwr['Site ID'].tolist()
 total_device_list = pd.read_csv(raw_path + 'network device list.csv')
@@ -24,6 +24,7 @@ pwr_file_list = os.listdir(raw_path + 'yearly_power_data/')
 
 #每个站点功率和RHS维修次数的关系
 for single_site in tqdm(site_list,desc='pwr-rhs'):
+    # print(single_site)
     if (single_site + '.csv') in pwr_file_list:
         single_site_pwr = pd.read_csv(raw_path + 'yearly_power_data/' + single_site + '.csv')
         single_site_pwr = pi.power_integrated(single_site_pwr)
