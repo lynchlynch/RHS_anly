@@ -70,6 +70,8 @@ date_list_sample, rhs_times_index_list, rhs_times_list = rt.rhs_times(rhs_log, '
 pwr_amt_ratio_pwr,pwr_amt_ratio_amt = ct.chi_test()
 max_fault_rate_list = []
 max_site_list = []
+# print(date_list_sample)
+# print(site_list)
 for date_index in tqdm(range(len(date_list_sample)),desc='fault'):
     max_fault_rate = 0
     max_site = 'N'
@@ -108,6 +110,8 @@ for date_index in tqdm(range(len(date_list_sample)),desc='fault'):
 
 plt.figure()
 plt.style.use('dark_background')
+print(rhs_times_index_list)
+print(max_fault_rate_list)
 plt.plot(rhs_times_index_list,max_fault_rate_list,'r^-')
 plt.xticks(rhs_times_index_list,date_list_sample,color='blue',rotation=60)
 
