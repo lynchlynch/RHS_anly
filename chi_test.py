@@ -25,8 +25,8 @@ def chi_test():
     # max_device_num = 100#假设每个站点最大的网络设备数为100，以便归一化处理
     power_rhs = [1,1,1,1,1,1,1,1]#变化率从20%-90%，共8档
     power_no_rhs = [1,1,1,1,1,1,1,1]#变化率从20%-90%，共8档
-    amount_rhs = [1,1,1,1,1]#设备数量变化率从15%-35%，共5档
-    amount_no_rhs = [1,1,1,1,1]#设备数量变化率从15%-35%，共5档
+    amount_rhs = [1,1,1,1,1,1,1]#设备数量变化率从15%-35%，共5档
+    amount_no_rhs = [1,1,1,1,1,1,1]#设备数量变化率从15%-45%，共5档
 
 
     #得到处理的前置条件，如日期等
@@ -65,6 +65,7 @@ def chi_test():
 
         #处理设备数量
             single_site_amount = len(total_device_list[total_device_list['Site ID']==single_site])
+            # print('single_site_amount=' + str(single_site_amount))
             amt_list_index = int((single_site_amount - 15) / 5)
             if len(rhs_select_df) == 0:
                 amount_no_rhs[amt_list_index] += 1

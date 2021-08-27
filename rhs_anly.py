@@ -12,9 +12,12 @@ import chi_test as ct
 raw_path = '/Users/pei/pydir/RHS_anly/raw_data/'
 result_path = '/Users/pei/pydir/RHS_anly/result/'
 rhs_log = pd.read_csv(raw_path + 'RHS Usage Log-Summary-update 20210827.csv')
+# print(rhs_log['Request Year-Month'].tolist())
 max_cab_pwr = pd.read_csv(raw_path + 'max_cab_power.csv')
 site_list = max_cab_pwr['Site ID'].tolist()
 total_device_list = pd.read_csv(raw_path + 'network device list.csv')
+# print(total_device_list[total_device_list['Site ID'] == site_list[0]])
+# print(site_list)
 
 pwr_file_list = os.listdir(raw_path + 'yearly_power_data/')
 for single_file in pwr_file_list:
@@ -76,13 +79,16 @@ for date_index in tqdm(range(len(date_list_sample)),desc='fault'):
     max_fault_rate = 0
     max_site = 'N'
     year_month = date_list_sample[date_index].split('-')[0] + '-' + str(int(date_list_sample[date_index].split('-')[1]))
+    # print('year_month=' + year_month)
     for single_site in site_list:
+        # print(single_site)
         single_file = single_site + '.csv'
         if single_file in pwr_file_list:
             single_site_pwr = pd.read_csv(raw_path + 'yearly_power_data/' + single_site + '.csv')
             single_site_pwr = pi.power_integrated(single_site_pwr)
             single_site_pwr = dz.de_zero(single_site_pwr)
             date_list_sample, rhs_times_index_list, rhs_times_list = rt.rhs_times(rhs_log, single_site, single_site_pwr)
+            # print(rhs_times_list)
             pwr_avg = single_site_pwr[single_site_pwr['Key'] == date_list_sample[date_index]]['Avg_Value'].tolist()[0]
             single_cab_pwr = max_cab_pwr[max_cab_pwr['Site ID']==single_site]['max_power'].tolist()[0]
             if pwr_avg == 0:
@@ -92,15 +98,20 @@ for date_index in tqdm(range(len(date_list_sample)),desc='fault'):
         else:#没有power data的情况
             rhs_times = len(rhs_log[(rhs_log['Site ID'] == single_site) & (rhs_log['Request Year-Month'] == year_month) &
                     (rhs_log['project'] == 'N')])
+            # print(rhs_log[rhs_log['Request Year-Month'] == year_month])
+            # print('rhs_times=' + str(rhs_times))
             single_cab_pwr = max_cab_pwr[max_cab_pwr['Site ID'] == single_site]['max_power'].tolist()[0]
             single_max_fault_rate_pwr = round(rhs_times / (1600 / single_cab_pwr), 0)
-        # print('single_max_fault_rate=' + str(single_max_fault_rate))
+        # print('single_max_fault_rate_pwr=' + str(single_max_fault_rate_pwr))
         #处理设备数量
         # rhs_select_df = rhs_log[(rhs_log['Request Year-Month'] == year_month) & (rhs_log['Site ID'] == single_site)]
         single_site_amount = len(total_device_list[total_device_list['Site ID'] == single_site])
+        # print('single_site_amount=' + str(single_site_amount))
         single_max_fault_rate_amt = single_site_amount/100#按100归一化
+        # print('single_max_fault_rate_amt=' + str(single_max_fault_rate_amt))
         # amt_list_index = int((single_site_amount - 15) / 5)
         single_max_fault_rate = pwr_amt_ratio_amt * single_max_fault_rate_pwr + pwr_amt_ratio_pwr * single_max_fault_rate_amt
+        # print('single_max_fault_rate = ' + str(single_max_fault_rate))
         if single_max_fault_rate > max_fault_rate:
             max_fault_rate = single_max_fault_rate
             max_site = single_site
@@ -110,8 +121,8 @@ for date_index in tqdm(range(len(date_list_sample)),desc='fault'):
 
 plt.figure()
 plt.style.use('dark_background')
-print(rhs_times_index_list)
-print(max_fault_rate_list)
+# print(rhs_times_index_list)
+# print(max_fault_rate_list)
 plt.plot(rhs_times_index_list,max_fault_rate_list,'r^-')
 plt.xticks(rhs_times_index_list,date_list_sample,color='blue',rotation=60)
 
