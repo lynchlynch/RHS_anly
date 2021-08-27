@@ -9,17 +9,14 @@ def rhs_times(rhs_log,site_id,raw_data):
     for single_year in list(range(raw_data_first_year,raw_data_last_year+1)):
         if single_year == raw_data_last_year:
             for single_month in list(range(1,raw_data_last_month+1)):
-                # year_month = ma.month_abbr(single_year, single_month)
                 year_month_list.append(str(single_year) + '-' + str(single_month))
         elif single_year == raw_data_first_year:
             for single_month in list(range(raw_data_first_month,13)):
                 year_month = ma.month_abbr(single_year,single_month)
-                # year_month = ma.month_abbr(single_year, single_month)
                 year_month_list.append(str(single_year) + '-' + str(single_month))
         else:
             for single_month in list(range(1,13)):
                 year_month = ma.month_abbr(single_year,single_month)
-                # year_month = ma.month_abbr(single_year, single_month)
                 year_month_list.append(str(single_year) + '-' + str(single_month))
 
     rhs_times_list = []
