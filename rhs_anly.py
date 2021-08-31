@@ -107,10 +107,8 @@ for date_index in tqdm(range(len(date_list_sample)),desc='fault'):
 
 plt.figure()
 plt.style.use('dark_background')
-# print(rhs_times_index_list)
-# print(max_fault_rate_list)
 plt.plot(rhs_times_index_list,max_fault_rate_list,'r^-')
-plt.xticks(rhs_times_index_list,date_list_sample,color='blue',rotation=60)
+plt.xticks(rhs_times_index_list,date_list_sample,color='white',rotation=60)
 
 for annote_index in range(len(rhs_times_index_list)):
     plt.annotate(max_site_list[annote_index], xy=(rhs_times_index_list[annote_index], max_fault_rate_list[annote_index]),
@@ -119,6 +117,24 @@ for annote_index in range(len(rhs_times_index_list)):
 plt.title('highest_fault_rate')
 # plt.show()
 plt.savefig(result_path + 'highest_fault_rate.png',bbox_inches='tight')
+plt.close()
+
+###画MBR的故障率图
+date_list_sample_mbr = ['2021-3','2021-4','2021-5','2021-6','2021-7','2021-8']
+rhs_times_index_list_mbr = rhs_times_index_list[-6:]
+max_fault_rate_list_mbr = max_fault_rate_list[-6:]
+max_site_list_mbr = max_site_list[-6:]
+plt.figure()
+plt.style.use('dark_background')
+plt.plot(rhs_times_index_list_mbr,max_fault_rate_list_mbr,'r^-')
+plt.xticks(rhs_times_index_list_mbr,date_list_sample_mbr,color='white',rotation=45)
+for annote_index in range(len(rhs_times_index_list_mbr)):
+    plt.annotate(max_site_list_mbr[annote_index], xy=(rhs_times_index_list_mbr[annote_index], max_fault_rate_list_mbr[annote_index]),
+                 xytext=(rhs_times_index_list_mbr[annote_index], max_fault_rate_list_mbr[annote_index] + (-1)**((annote_index+1)%2) * 0.5),
+                 xycoords='data',arrowprops=dict(facecolor='blue', shrink=0.05))
+plt.title('highest_fault_rate')
+# plt.show()
+plt.savefig(result_path + 'highest_fault_rate_mbr.png',bbox_inches='tight')
 plt.close()
 
 #计算单个工单需要的模块量
