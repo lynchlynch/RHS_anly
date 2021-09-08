@@ -1,4 +1,2 @@
-a = list(range(6))
-print(a)
-
-print(a[-5:])
+a = [2,3,4,5,6]
+print(sum(a))
