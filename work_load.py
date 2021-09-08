@@ -18,4 +18,3 @@ rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update 20210827.xlsx',
 max_cab_pwr = pd.read_csv(raw_path + 'max_cab_power.csv')
 site_list = max_cab_pwr['Site ID'].tolist()
 total_device_list = pd.read_csv(raw_path + 'network device list.csv')
-
