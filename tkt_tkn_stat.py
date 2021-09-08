@@ -66,3 +66,30 @@ def token_stat(raw_data,site_list,city_list):
         stat_num_daily.append(sum(select_daily_df['Number of Tokens'].tolist()))
 
     return stat_num_daily, stat_num_breakfix, stat_num_deployment
+
+
+def cost_stat(raw_data,site_list,city_list):
+    cost_baseline = [600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600]
+    stat_cost_breakfix = []
+    stat_cost_deployment = []
+    stat_cost_baseline = []
+
+    for single_city in city_list:
+        select_breakfix_df = raw_data[
+            (raw_data['Site ID'].str.contains(single_city)) & (raw_data['project'] == 'N')]
+        stat_cost_breakfix.append(sum(select_breakfix_df['Cost'].tolist()))
+
+        select_deployment_df = raw_data[(raw_data['Site ID'].str.contains(single_city)) & (raw_data['project'] == 'Y')]
+        stat_cost_deployment.append(sum(select_deployment_df['Cost'].tolist()))
+
+        select_total_df = raw_data[raw_data['Site ID'].str.contains(single_city)]
+        select_site_list = list(set(select_total_df['Site ID'].tolist()))
+        total_baseline_cost = 0
+        for single_site in select_site_list:
+            site_index = site_list.index(single_site)
+            single_site_price = cost_baseline[site_index]
+            total_month = len(select_total_df[select_total_df['Site ID']==single_site])
+            total_baseline_cost = total_baseline_cost + single_site_price * total_month
+        stat_cost_baseline.append(total_baseline_cost)
+
+    return stat_cost_breakfix, stat_cost_deployment, stat_cost_baseline

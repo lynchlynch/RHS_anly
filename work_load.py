@@ -11,9 +11,9 @@ import chi_test as ct
 
 raw_path = '/Users/pei/pydir/RHS_anly/raw_data/'
 result_path = '/Users/pei/pydir/RHS_anly/result/'
-rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update 20210827的副本.xlsx',engine='openpyxl',sheet_name='Log')
-# rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update 20210827.xlsx',engine='openpyxl',sheet_name='Log')
-# print(rhs_log)
+# rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update 20210827的副本.xlsx',engine='openpyxl',sheet_name='Log')
+rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update 20210827.xlsx',engine='openpyxl',sheet_name='Log')
+# print(rhs_log['Request Year-Month'].tolist())
 # print(rhs_log['Request Year-Month'].tolist())
 max_cab_pwr = pd.read_csv(raw_path + 'max_cab_power.csv')
 site_list = max_cab_pwr['Site ID'].tolist()
@@ -57,7 +57,7 @@ stat_num_daily, stat_num_breakfix, stat_num_deployment = tts.token_stat(rhs_log,
 total_token = list(np.array(stat_num_daily) + np.array(stat_num_breakfix) + np.array(stat_num_deployment))
 
 bar_width = 0.4
-index_city_list = np.array(list(range(len(ct_list))))
+index_city_list = np.array(list(range(len(stat_num_daily))))
 bottom_deployment = list(np.array(stat_num_daily) + np.array(stat_num_breakfix))
 
 plt.close()
@@ -78,4 +78,28 @@ plt.xticks(np.array(index_city_list)+bar_width/2,city_simple_list,rotation=45)
 plt.title('Token QTY')
 plt.savefig(result_path + 'work_load_token.png')
 
+##统计成本
+stat_cost_breakfix, stat_cost_deployment, stat_cost_baseline = tts.cost_stat(rhs_log,site_list,city_list)
+total_cost = list(np.array(stat_cost_breakfix) + np.array(stat_cost_deployment) + np.array(stat_cost_baseline))
 
+bar_width = 0.4
+index_city_list = np.array(list(range(len(stat_cost_breakfix))))
+bottom_deployment = list(np.array(stat_cost_baseline) + np.array(stat_cost_breakfix))
+
+plt.close()
+plt.style.use('dark_background')
+plt.bar(index_city_list+bar_width/2,height=stat_cost_baseline,width=bar_width,color='red',label='Baseline Cost')
+plt.bar(index_city_list+bar_width/2,height=stat_cost_breakfix,bottom=stat_cost_baseline,width=bar_width,color='lime',label='Breakfix Cost')
+plt.bar(index_city_list+bar_width/2,height=stat_cost_deployment,bottom=bottom_deployment,width=bar_width,color='orange',label='Deployment Cost')
+
+for index in range(len(index_city_list)):
+    plt.text(index_city_list[index]-bar_width/10,stat_cost_baseline[index]/2,str('%.0f'%stat_cost_baseline[index]))
+    plt.text(index_city_list[index]-bar_width/10, stat_cost_baseline[index] + stat_cost_breakfix[index] / 2, str('%.0f' % stat_cost_breakfix[index]))
+    plt.text(index_city_list[index]-bar_width/10, bottom_deployment[index] + stat_cost_deployment[index] / 2, str('%.0f' % stat_cost_deployment[index]))
+    plt.text(index_city_list[index]-bar_width/10,total_cost[index]+50,str('%.0f'%total_cost[index]))
+
+plt.legend()
+city_simple_list = ['BJS','SHA','CAN','CTU','WUH']
+plt.xticks(np.array(index_city_list)+bar_width/2,city_simple_list,rotation=45)
+plt.title('Cost(Yuan)')
+plt.savefig(result_path + 'work_load_cost.png')
