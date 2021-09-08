@@ -200,5 +200,5 @@ x_index = list(range(process_period))
 plt.xticks(x_index,current_year_month_list_reverse,rotation=45)
 plt.legend()
 
-plt.title('Ticket-Tocken')
+plt.title('Ticket-Token')
 plt.savefig(result_path + 'ticket_token')
