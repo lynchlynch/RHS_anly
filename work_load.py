@@ -11,8 +11,8 @@ import chi_test as ct
 
 raw_path = '/Users/pei/pydir/RHS_anly/raw_data/'
 result_path = '/Users/pei/pydir/RHS_anly/result/'
-# rhs_log = pd.read_csv(raw_path + 'RHS Usage Log-Summary-update 20210827.csv')
-rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update 20210827.xlsx',engine='openpyxl',sheet_name='Log')
+rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update 20210827的副本.xlsx',engine='openpyxl',sheet_name='Log')
+# rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update 20210827.xlsx',engine='openpyxl',sheet_name='Log')
 # print(rhs_log)
 # print(rhs_log['Request Year-Month'].tolist())
 max_cab_pwr = pd.read_csv(raw_path + 'max_cab_power.csv')
@@ -53,6 +53,29 @@ plt.title('Ticket QTY')
 plt.savefig(result_path + 'work_load_ticket.png')
 
 ####Token量堆叠
-stat_num_charged,stat_num_un_charged = tts.token_stat(rhs_log,site_list,city_list)
-print(stat_num_charged)
-print(stat_num_un_charged)
+stat_num_daily, stat_num_breakfix, stat_num_deployment = tts.token_stat(rhs_log,site_list,city_list)
+total_token = list(np.array(stat_num_daily) + np.array(stat_num_breakfix) + np.array(stat_num_deployment))
+
+bar_width = 0.4
+index_city_list = np.array(list(range(len(ct_list))))
+bottom_deployment = list(np.array(stat_num_daily) + np.array(stat_num_breakfix))
+
+plt.close()
+plt.style.use('dark_background')
+plt.bar(index_city_list+bar_width/2,height=stat_num_daily,width=bar_width,color='red',label='Daily Run')
+plt.bar(index_city_list+bar_width/2,height=stat_num_breakfix,bottom=stat_num_daily,width=bar_width,color='lime',label='Breakfix')
+plt.bar(index_city_list+bar_width/2,height=stat_num_deployment,bottom=bottom_deployment,width=bar_width,color='orange',label='Deployment')
+
+for index in range(len(index_city_list)):
+    plt.text(index_city_list[index]+bar_width/3,stat_num_daily[index]/2,str('%.0f'%stat_num_daily[index]))
+    plt.text(index_city_list[index] + bar_width / 3, stat_num_daily[index] + stat_num_breakfix[index] / 2, str('%.0f' % stat_num_breakfix[index]))
+    plt.text(index_city_list[index] + bar_width / 3, bottom_deployment[index] + stat_num_deployment[index] / 2, str('%.0f' % stat_num_deployment[index]))
+    plt.text(index_city_list[index]+bar_width/3,total_token[index]+1,str('%.0f'%total_token[index]))
+
+plt.legend()
+city_simple_list = ['BJS','SHA','CAN','CTU','WUH']
+plt.xticks(np.array(index_city_list)+bar_width/2,city_simple_list,rotation=45)
+plt.title('Token QTY')
+plt.savefig(result_path + 'work_load_token.png')
+
+

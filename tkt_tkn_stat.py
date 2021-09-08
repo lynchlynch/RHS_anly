@@ -35,18 +35,34 @@ def tkt_stat(raw_data,site_list,city_list):
     return ct_list,cm_list,cu_list,third_part_list,sum_per_city_list
 
 def token_stat(raw_data,site_list,city_list):
-    # charged = [0,0,0,0,0]
-    # un_charged = [0,0,0,0,0]
+    '''
     stat_num_charged = []
     stat_num_un_charged = []
-    # for single_site in site_list:
+
     for single_city in city_list:
-        print(raw_data[single_city in raw_data['Site ID']])
-        select_charged_df = raw_data[(single_city in raw_data['Site ID'])&(raw_data['Token Type']!='Daily-A')]
+        select_charged_df = raw_data[(raw_data['Site ID'].str.contains(single_city))&(raw_data['Token Type']!='Daily-A')]
         stat_num_charged.append(sum(select_charged_df['Number of Tokens'].tolist()))
-        select_un_charged_df = raw_data[(single_city in raw_data['Site ID'])&(raw_data['Token Type']=='Daily-A')]
+        select_un_charged_df = raw_data[(raw_data['Site ID'].str.contains(single_city))&(raw_data['Token Type']=='Daily-A')]
         stat_num_un_charged.append(sum(select_un_charged_df['Number of Tokens'].tolist()))
 
-
-
     return stat_num_charged,stat_num_un_charged
+    '''
+    stat_num_daily = []
+    stat_num_breakfix = []
+    stat_num_deployment = []
+
+    for single_city in city_list:
+        select_breakfix_df = raw_data[
+            (raw_data['Site ID'].str.contains(single_city)) & (raw_data['Token Type'] != 'Daily-A') &
+            (raw_data['project'] == 'N')]
+        stat_num_breakfix.append(sum(select_breakfix_df['Number of Tokens'].tolist()))
+
+        select_deployment_df = raw_data[(raw_data['Site ID'].str.contains(single_city)) &
+                                        (raw_data['Token Type'] != 'Daily-A') & (raw_data['project'] == 'Y')]
+        stat_num_deployment.append(sum(select_deployment_df['Number of Tokens'].tolist()))
+
+        select_daily_df = raw_data[(raw_data['Site ID'].str.contains(single_city)) &
+                                   (raw_data['Token Type'] == 'Daily-A')]
+        stat_num_daily.append(sum(select_daily_df['Number of Tokens'].tolist()))
+
+    return stat_num_daily, stat_num_breakfix, stat_num_deployment
