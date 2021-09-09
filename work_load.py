@@ -97,7 +97,7 @@ for index in range(len(index_city_list)):
     plt.text(index_city_list[index]-bar_width/10,stat_cost_baseline[index]/2,str('%.0f'%stat_cost_baseline[index]))
     plt.text(index_city_list[index]-bar_width/10, stat_cost_baseline[index] + stat_cost_breakfix[index] / 2, str('%.0f' % stat_cost_breakfix[index]))
     plt.text(index_city_list[index]-bar_width/10, bottom_deployment[index] + stat_cost_deployment[index] / 2, str('%.0f' % stat_cost_deployment[index]))
-    plt.text(index_city_list[index]-bar_width/10,total_cost[index]+50,str('%.0f'%total_cost[index]))
+    plt.text(index_city_list[index]-bar_width/10,total_cost[index]+5000,str('%.0f'%total_cost[index]))
 
 plt.legend()
 city_simple_list = ['BJS','SHA','CAN','CTU','WUH']
