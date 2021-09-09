@@ -69,7 +69,7 @@ def token_stat(raw_data,site_list,city_list):
 
 
 def cost_stat(raw_data,site_list,city_list):
-    cost_baseline = [600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600,600]
+    cost_baseline = [8400,0,8000,3500,5300,15000,8000,3500,20700,15000,8000,3500,8400,8500,8000,600,15000,8300,8000]
     stat_cost_breakfix = []
     stat_cost_deployment = []
     stat_cost_baseline = []
