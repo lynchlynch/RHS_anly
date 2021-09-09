@@ -3,15 +3,15 @@ from scipy import stats
 import os
 import numpy as np
 
-import month_abbr as ma
+from tqdm import tqdm
 import de_zero as dz
 import rhs_times as rt
 import power_integrated as pi
 
-def chi_test():
+def chi_test(rhs_log):
     raw_path = '/Users/pei/pydir/RHS_anly/raw_data/'
     result_path = '/Users/pei/pydir/RHS_anly/result/'
-    rhs_log = pd.read_csv(raw_path + 'RHS Usage Log-Summary-update 20210827.csv')
+    # rhs_log = pd.read_csv(raw_path + 'RHS Usage Log-Summary-update 20210827.csv')
     max_cab_pwr = pd.read_csv(raw_path + 'max_cab_power.csv')
     total_device_list = pd.read_csv(raw_path + 'network device list.csv')
     site_list = max_cab_pwr['Site ID'].tolist()
@@ -113,3 +113,66 @@ def chi_test():
     pwr_amt_ratio_amt = chi_squared_stat_amt / (chi_squared_stat_pwr + chi_squared_stat_amt)
     print('pwr_amt_ratio_amt = ' + str(pwr_amt_ratio_amt))
     return pwr_amt_ratio_pwr,pwr_amt_ratio_amt
+
+def chi_test_workload(raw_path,rhs_log,site_list,max_cab_pwr,total_device_list):
+    bjs_power_avg = pd.read_csv(raw_path + 'yearly_power_data/CU Beijing.csv')
+    bjs_power_avg = pi.power_integrated(bjs_power_avg)
+    bjs_power_avg = dz.de_zero(bjs_power_avg)
+    date_list_sample, rhs_times_index_list, rhs_times_list = rt.rhs_times(rhs_log, 'CU Beijing', bjs_power_avg)
+    pwr_amt_ratio_pwr, pwr_amt_ratio_amt = chi_test(rhs_log)
+    max_fault_rate_list = []
+    max_site_list = []
+    pwr_file_list = os.listdir(raw_path + 'yearly_power_data/')
+    for single_file in pwr_file_list:
+        if single_file.split('.')[1] != 'csv':
+            os.remove(raw_path + 'yearly_power_data/' + single_file)
+    pwr_file_list = os.listdir(raw_path + 'yearly_power_data/')
+
+    fault_rate_df = pd.DataFrame([])
+    for date_index in tqdm(list(range(len(date_list_sample))[-8:]), desc='fault'):
+        # max_fault_rate = 0
+        # max_site = 'N'
+        year_month = date_list_sample[date_index].split('-')[0] + '-' + str(
+            int(date_list_sample[date_index].split('-')[1]))
+        # print('year_month=' + year_month)
+        for single_site in site_list:
+            # print(single_site)
+            single_file = single_site + '.csv'
+            if single_file in pwr_file_list:
+                single_site_pwr = pd.read_csv(raw_path + 'yearly_power_data/' + single_site + '.csv')
+                single_site_pwr = pi.power_integrated(single_site_pwr)
+                single_site_pwr = dz.de_zero(single_site_pwr)
+                date_list_sample, rhs_times_index_list, rhs_times_list = rt.rhs_times(rhs_log, single_site,
+                                                                                      single_site_pwr)
+                # print(rhs_times_list)
+                pwr_avg = single_site_pwr[single_site_pwr['Key'] == date_list_sample[date_index]]['Avg_Value'].tolist()[
+                    0]
+                single_cab_pwr = max_cab_pwr[max_cab_pwr['Site ID'] == single_site]['max_power'].tolist()[0]
+                if pwr_avg == 0:
+                    single_max_fault_rate_pwr = round(rhs_times_list[date_index] / (1600 / single_cab_pwr), 3)
+                else:
+                    single_max_fault_rate_pwr = round(rhs_times_list[date_index] / (pwr_avg / single_cab_pwr), 3)
+            else:  # 没有power data的情况
+                rhs_times = len(
+                    rhs_log[(rhs_log['Site ID'] == single_site) & (rhs_log['Request Year-Month'] == year_month) &
+                            (rhs_log['project'] == 'N')])
+                # print(rhs_log[rhs_log['Request Year-Month'] == year_month])
+                # print('rhs_times=' + str(rhs_times))
+                single_cab_pwr = max_cab_pwr[max_cab_pwr['Site ID'] == single_site]['max_power'].tolist()[0]
+                single_max_fault_rate_pwr = round(rhs_times / (1600 / single_cab_pwr), 0)
+            # print('single_max_fault_rate_pwr=' + str(single_max_fault_rate_pwr))
+            # 处理设备数量
+            # rhs_select_df = rhs_log[(rhs_log['Request Year-Month'] == year_month) & (rhs_log['Site ID'] == single_site)]
+            single_site_amount = len(total_device_list[total_device_list['Site ID'] == single_site])
+            # print('single_site_amount=' + str(single_site_amount))
+            single_max_fault_rate_amt = single_site_amount / 100  # 按100归一化
+            # print('single_max_fault_rate_amt=' + str(single_max_fault_rate_amt))
+            # amt_list_index = int((single_site_amount - 15) / 5)
+            single_max_fault_rate = pwr_amt_ratio_amt * single_max_fault_rate_pwr + pwr_amt_ratio_pwr * single_max_fault_rate_amt
+            # print('single_max_fault_rate = ' + str(single_max_fault_rate))
+            add_df = pd.DataFrame(
+                {'Month': [year_month], 'Site ID': [single_site], 'Fault_Rate': [single_max_fault_rate]})
+            fault_rate_df = fault_rate_df.append(add_df)
+    # print(fault_rate_df)
+    fault_rate_df.to_csv(raw_path+'1.csv')
+    return fault_rate_df

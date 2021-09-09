@@ -56,7 +56,7 @@ date_list_sample, rhs_times_index_list, rhs_times_list = rt.rhs_times(rhs_log, '
 
 #遍历所有站点power，计算归一化的故障率，然后排序，计算每个月故障最多的站点
 #利用卡方检验来动态计算设备功耗，设备数量的权重
-pwr_amt_ratio_pwr,pwr_amt_ratio_amt = ct.chi_test()
+pwr_amt_ratio_pwr,pwr_amt_ratio_amt = ct.chi_test(rhs_log)
 max_fault_rate_list = []
 max_site_list = []
 # print(date_list_sample)

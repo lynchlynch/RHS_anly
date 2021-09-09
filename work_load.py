@@ -2,11 +2,12 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import tqdm
+import os
 
 import tkt_tkn_stat as tts
 import rhs_times as rt
 import power_integrated as pi
-import rhs_consumable as rc
+import de_zero as dz
 import chi_test as ct
 
 raw_path = '/Users/pei/pydir/RHS_anly/raw_data/'
@@ -103,3 +104,47 @@ city_simple_list = ['BJS','SHA','CAN','CTU','WUH']
 plt.xticks(np.array(index_city_list)+bar_width/2,city_simple_list,rotation=45)
 plt.title('Cost(Yuan)')
 plt.savefig(result_path + 'work_load_cost.png')
+
+##画故障曲线
+#利用卡方检验来动态计算设备功耗，设备数量的权重
+fault_rate_df = ct.chi_test_workload(raw_path,rhs_log,site_list,max_cab_pwr,total_device_list)
+month_list = fault_rate_df['Month'].tolist()
+
+bjs_fault_list = []
+sha_fault_list = []
+can_fault_list = []
+ctu_fault_list = []
+wuh_fault_list = []
+for single_month in month_list:
+    single_bjs_fault = sum(fault_rate_df[(fault_rate_df['Month']==single_month) and
+                                     (fault_rate_df['Site ID'].str.contains('Beijing'))]['Fault_Rate'])
+    bjs_fault_list.append(single_bjs_fault)
+
+    single_sha_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) and
+                                         (fault_rate_df['Site ID'].str.contains('Shanghai'))]['Fault_Rate'])
+    sha_fault_list.append(single_sha_fault)
+
+    single_can_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) and
+                                         (fault_rate_df['Site ID'].str.contains('Guangzhou'))]['Fault_Rate'])
+    can_fault_list.append(single_can_fault)
+
+    single_ctu_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) and
+                                         (fault_rate_df['Site ID'].str.contains('Chengdu'))]['Fault_Rate'])
+    ctu_fault_list.append(single_ctu_fault)
+
+    single_wuh_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) and
+                                         (fault_rate_df['Site ID'].str.contains('Wuhan'))]['Fault_Rate'])
+    wuh_fault_list.append(single_wuh_fault)
+
+plt.close()
+plt.style.use('dark_background')
+plt.plot(bjs_fault_list,color='red',label='BJS Fault')
+plt.plot(sha_fault_list,color='lime',label='SHA Fault')
+plt.plot(can_fault_list,color='orange',label='CAN Fault')
+plt.plot(ctu_fault_list,color='deepskyblue',label='CTU Fault')
+plt.plot(wuh_fault_list,color='sienna',label='WUH Fault')
+
+plt.legend()
+plt.xticks(list(range(len(wuh_fault_list))),month_list,rotation=45)
+plt.title('Fault Trend')
+plt.savefig(result_path + 'work_load_fault_trend.png')
