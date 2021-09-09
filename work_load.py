@@ -108,7 +108,9 @@ plt.savefig(result_path + 'work_load_cost.png')
 ##画故障曲线
 #利用卡方检验来动态计算设备功耗，设备数量的权重
 fault_rate_df = ct.chi_test_workload(raw_path,rhs_log,site_list,max_cab_pwr,total_device_list)
-month_list = fault_rate_df['Month'].tolist()
+month_list = list(set(fault_rate_df['Month'].tolist()))
+month_list.sort()
+print(month_list)
 
 bjs_fault_list = []
 sha_fault_list = []
@@ -116,24 +118,24 @@ can_fault_list = []
 ctu_fault_list = []
 wuh_fault_list = []
 for single_month in month_list:
-    single_bjs_fault = sum(fault_rate_df[(fault_rate_df['Month']==single_month) and
-                                     (fault_rate_df['Site ID'].str.contains('Beijing'))]['Fault_Rate'])
+    single_bjs_fault = sum(fault_rate_df[(fault_rate_df['Month']==single_month) &
+                                         (fault_rate_df['Site ID'].str.contains('Beijing'))]['Fault_Rate'].tolist())
     bjs_fault_list.append(single_bjs_fault)
 
-    single_sha_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) and
-                                         (fault_rate_df['Site ID'].str.contains('Shanghai'))]['Fault_Rate'])
+    single_sha_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) &
+                                         (fault_rate_df['Site ID'].str.contains('Shanghai'))]['Fault_Rate'].tolist())
     sha_fault_list.append(single_sha_fault)
 
-    single_can_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) and
-                                         (fault_rate_df['Site ID'].str.contains('Guangzhou'))]['Fault_Rate'])
+    single_can_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) &
+                                         (fault_rate_df['Site ID'].str.contains('Guangzhou'))]['Fault_Rate'].tolist())
     can_fault_list.append(single_can_fault)
 
-    single_ctu_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) and
-                                         (fault_rate_df['Site ID'].str.contains('Chengdu'))]['Fault_Rate'])
+    single_ctu_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) &
+                                         (fault_rate_df['Site ID'].str.contains('Chengdu'))]['Fault_Rate'].tolist())
     ctu_fault_list.append(single_ctu_fault)
 
-    single_wuh_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) and
-                                         (fault_rate_df['Site ID'].str.contains('Wuhan'))]['Fault_Rate'])
+    single_wuh_fault = sum(fault_rate_df[(fault_rate_df['Month'] == single_month) &
+                                         (fault_rate_df['Site ID'].str.contains('Wuhan'))]['Fault_Rate'].tolist())
     wuh_fault_list.append(single_wuh_fault)
 
 plt.close()
@@ -145,6 +147,8 @@ plt.plot(ctu_fault_list,color='deepskyblue',label='CTU Fault')
 plt.plot(wuh_fault_list,color='sienna',label='WUH Fault')
 
 plt.legend()
+print(wuh_fault_list)
+print(month_list)
 plt.xticks(list(range(len(wuh_fault_list))),month_list,rotation=45)
 plt.title('Fault Trend')
 plt.savefig(result_path + 'work_load_fault_trend.png')
