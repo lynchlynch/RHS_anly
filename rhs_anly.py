@@ -12,7 +12,7 @@ import chi_test as ct
 raw_path = '/Users/pei/pydir/RHS_anly/raw_data/'
 result_path = '/Users/pei/pydir/RHS_anly/result/'
 # rhs_log = pd.read_csv(raw_path + 'RHS Usage Log-Summary-update 20210827.csv')
-rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update 20210827.xlsx',engine='openpyxl',sheet_name='Log')
+rhs_log = pd.read_excel(raw_path + 'RHS Usage Log-Summary-update.xlsx',engine='openpyxl',sheet_name='Log')
 # print(rhs_log)
 # print(rhs_log['Request Year-Month'].tolist())
 max_cab_pwr = pd.read_csv(raw_path + 'max_cab_power.csv')
@@ -120,7 +120,7 @@ plt.savefig(result_path + 'highest_fault_rate.png',bbox_inches='tight')
 plt.close()
 
 ###画MBR的故障率图
-date_list_sample_mbr = ['2021-3','2021-4','2021-5','2021-6','2021-7','2021-8']
+date_list_sample_mbr = ['2021-4','2021-5','2021-6','2021-7','2021-8','2021-9']
 rhs_times_index_list_mbr = rhs_times_index_list[-6:]
 max_fault_rate_list_mbr = max_fault_rate_list[-6:]
 max_site_list_mbr = max_site_list[-6:]
@@ -130,7 +130,7 @@ plt.plot(rhs_times_index_list_mbr,max_fault_rate_list_mbr,'r^-')
 plt.xticks(rhs_times_index_list_mbr,date_list_sample_mbr,color='white',rotation=45)
 for annote_index in range(len(rhs_times_index_list_mbr)):
     plt.annotate(max_site_list_mbr[annote_index], xy=(rhs_times_index_list_mbr[annote_index], max_fault_rate_list_mbr[annote_index]),
-                 xytext=(rhs_times_index_list_mbr[annote_index], max_fault_rate_list_mbr[annote_index] + (-1)**((annote_index+1)%2) * 0.5),
+                 xytext=(rhs_times_index_list_mbr[annote_index], max_fault_rate_list_mbr[annote_index] + (-1)**((annote_index+1)%2) * 0.1),
                  xycoords='data',arrowprops=dict(facecolor='blue', shrink=0.05))
 plt.title('highest_fault_rate')
 # plt.show()
@@ -171,6 +171,7 @@ for index in range(process_period):
         # print(current_year_month)
     current_year_month_list.append(current_year_month)
 
+#ticket-token量
 rhs_times_list = []
 token_qty_list = []
 for index in range(process_period):
@@ -178,6 +179,7 @@ for index in range(process_period):
     rhs_times = len(rhs_log[rhs_log['Request Year-Month']==current_year_month])
     rhs_times_list.append(rhs_times)
     token_num_per_month = sum(rhs_log[rhs_log['Request Year-Month']==current_year_month]['Number of Tokens'].tolist())
+    # print('current_year_month = ' + str(token_num_per_month))
     token_qty_list.append(token_num_per_month)
 
 # print(rhs_times_list)
