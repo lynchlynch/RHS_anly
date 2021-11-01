@@ -60,12 +60,14 @@ pwr_amt_ratio_pwr,pwr_amt_ratio_amt = ct.chi_test(rhs_log)
 max_fault_rate_list = []
 max_site_list = []
 # print(date_list_sample)
-# print(site_list)
+fault_rate_df = pd.DataFrame([])
+fault_rate_df['Site_list'] = site_list
+# year_month_list = []
 for date_index in tqdm(range(len(date_list_sample)),desc='fault'):
     max_fault_rate = 0
     max_site = 'N'
     year_month = date_list_sample[date_index].split('-')[0] + '-' + str(int(date_list_sample[date_index].split('-')[1]))
-    # print('year_month=' + year_month)
+    fault_per_month_list = []
     for single_site in site_list:
         # print(single_site)
         single_file = single_site + '.csv'
@@ -97,13 +99,20 @@ for date_index in tqdm(range(len(date_list_sample)),desc='fault'):
         # print('single_max_fault_rate_amt=' + str(single_max_fault_rate_amt))
         # amt_list_index = int((single_site_amount - 15) / 5)
         single_max_fault_rate = pwr_amt_ratio_amt * single_max_fault_rate_pwr + pwr_amt_ratio_pwr * single_max_fault_rate_amt
-        # print('single_max_fault_rate = ' + str(single_max_fault_rate))
+        fault_per_month_list.append(single_max_fault_rate)
         if single_max_fault_rate > max_fault_rate:
             max_fault_rate = single_max_fault_rate
             max_site = single_site
+    # fault_rate_add_df = pd.DataFrame(fault_per_month_list)
+    # fault_rate_df = fault_rate_df.append(fault_rate_add_df)
+    # print(fault_per_month_list)
+    fault_rate_df.insert(loc=len(fault_rate_df.columns),column=year_month,value=fault_per_month_list)
 
     max_fault_rate_list.append(max_fault_rate)
     max_site_list.append(max_site)
+#储存详细的fault_rate
+# print(fault_rate_df)
+fault_rate_df.to_csv(result_path + 'fault_rate_df.csv',index=False)
 
 plt.figure()
 plt.style.use('dark_background')
